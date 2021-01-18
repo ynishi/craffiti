@@ -1,0 +1,87 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 8432d8c90858dfa135cd59c4970c633fefb564d0693165c96614158341381786
+
+name:           craffiti
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/craffiti#readme>
+homepage:       https://github.com/ynishi/craffiti#readme
+bug-reports:    https://github.com/ynishi/craffiti/issues
+author:         Yutaka Nishimura
+maintainer:     ytk.nishimura@gmail.com
+copyright:      2021 Yutaka Nishimura
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/ynishi/craffiti
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_craffiti
+  hs-source-dirs:
+      src
+  default-extensions: NoImplicitPrelude OverloadedStrings
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
+  build-depends:
+      base >=4.7 && <5
+    , bytestring
+    , foldl
+    , optparse-applicative
+    , rio
+    , text
+    , turtle
+    , utf8-string
+  default-language: Haskell2010
+
+executable craffiti-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_craffiti
+  hs-source-dirs:
+      app
+  default-extensions: NoImplicitPrelude OverloadedStrings
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , bytestring
+    , craffiti
+    , foldl
+    , optparse-applicative
+    , rio
+    , text
+    , turtle
+    , utf8-string
+  default-language: Haskell2010
+
+test-suite craffiti-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_craffiti
+  hs-source-dirs:
+      test
+  default-extensions: NoImplicitPrelude OverloadedStrings
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , bytestring
+    , craffiti
+    , foldl
+    , optparse-applicative
+    , rio
+    , text
+    , turtle
+    , utf8-string
+  default-language: Haskell2010
