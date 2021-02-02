@@ -51,28 +51,27 @@ noOpProgram = do
   (_, xi) <- singleton . Init $ ["echo", "noOp", "init"]
   (_, yi) <- singleton $ Install ["echo", "noOp", "init"] "."
   (_, i) <- singleton $ Check [xi, yi]
-  return ("", i)  
+  return ("", i)
 
--- TODO: integrate with RIO with Operational
 runPrep :: Bool -> Program Prep a -> IO a
 runPrep initOpt = interpretWithMonad eval where
   eval :: Prep a -> IO a
-  eval (Init commands) = do
-    runSimpleApp . logInfo . displayBytesUtf8 . BSU.fromString $ "start init:" ++ show commands
+  eval (Init commands) = runSimpleApp $ do
+    logInfo . displayBytesUtf8 . BSU.fromString $ "start init:" ++ show commands
     res <- Prep.get . toCmd $ commands
-    runSimpleApp . logInfo . displayBytesUtf8 . BSU.fromString $ "end init:" ++ show commands ++ ":"++ show res
+    logInfo . displayBytesUtf8 . BSU.fromString $ "end init:" ++ show commands ++ ":"++ show res
     return  (show res, 0)
-  eval (Install commands projectName) = do
+  eval (Install commands projectName) = runSimpleApp $ do
       res <- if initOpt then
-         runSimpleApp . logInfo . displayBytesUtf8 . BSU.fromString $ "option init set, don't install:" ++ show commands
+         logInfo . displayBytesUtf8 . BSU.fromString $ "option init set, don't install:" ++ show commands
       else do
          T.cd $ T.fromString projectName
-         runSimpleApp . logInfo . displayBytesUtf8 . BSU.fromString $ "start install:" ++ show commands
+         logInfo . displayBytesUtf8 . BSU.fromString $ "start install:" ++ show commands
          res <- Prep.get . toCmd $ commands
-         runSimpleApp . logInfo . displayBytesUtf8 . BSU.fromString $ "end install:" ++ show commands ++ show res
+         logInfo . displayBytesUtf8 . BSU.fromString $ "end install:" ++ show commands ++ show res
       return  (show res, 0)
-  eval (Check x) = do
-    runSimpleApp . logInfo . displayBytesUtf8 . BSU.fromString $ "check:" ++ show x
+  eval (Check x) = runSimpleApp $ do
+    logInfo . displayBytesUtf8 . BSU.fromString $ "check:" ++ show x
     return (show x, sum x)
 
 get cmd = T.fold (T.inshell cmd T.empty) Fold.head
