@@ -11,6 +11,7 @@ import Options.Applicative
 import qualified Turtle as T
 
 import Data.ByteString.UTF8 as BSU
+import qualified Control.Foldl as Fold
 
 import Prep
 
@@ -20,7 +21,7 @@ data Opt = Opt
 
 data Command = New
   { projectName :: String,
-    init :: Bool}
+    initOpt :: Bool}
 
 
 optParser :: Parser Opt
@@ -48,7 +49,7 @@ projectDirs = ["", ".craffiti", "front", "server", "ai", "batch"]
 run :: Opt -> IO ()
 run opt =
   case optCommand opt of
-    New projectName init ->
+    New projectName initOpt ->
       runSimpleApp $ do
         logInfo $
           displayBytesUtf8 $
@@ -57,9 +58,12 @@ run opt =
         mapM_ (\d -> T.mkdir $ projectPath T.</> d) projectDirs
         T.cd projectPath
         T.cd "front"
-        liftIO $ runPrep init (reactProgram projectName)
+        liftIO $ runPrep initOpt (reactProgram projectName)
         T.cd ".." >> T.cd "server"
-        liftIO $ runPrep init (stackProgram projectName)
-        T.cd ".."
+        liftIO $ runPrep initOpt (stackProgram projectName)
+        T.cd ".." >> T.cd "ai"
+        liftIO $ runPrep initOpt noOpProgram
+        T.cd ".." >> T.cd "batch"
+        liftIO $ runPrep initOpt noOpProgram
         logInfo $
           displayBytesUtf8 $ BSU.fromString "success, Have a fan to craft!"
