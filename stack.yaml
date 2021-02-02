@@ -40,7 +40,12 @@ packages:
 # - git: https://github.com/commercialhaskell/stack.git
 #   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a
 #
-# extra-deps: []
+extra-deps:
+  - free-operational-0.5.0.0@sha256:44044c37672c4db99bf23bcb6d40cccead32013b6da7a9bf0b4f9e9a46ce6c69,3343
+  - comonad-transformers-4.0@sha256:cdc81f6837836ec4b120ced8503b54a7f1e230e08971cc01717dcd16ba1ceb28,831
+  - kan-extensions-3.7@sha256:a2178e90704e502b1739c6d8fd5b286d8529554c6afd17a33c84b3815a3d059e,2328
+
+
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

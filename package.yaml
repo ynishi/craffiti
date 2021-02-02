@@ -28,6 +28,7 @@ dependencies:
 - text
 - turtle
 - utf8-string
+- operational
 
 ghc-options:
 - -Wall
