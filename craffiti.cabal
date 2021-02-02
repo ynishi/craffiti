@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8432d8c90858dfa135cd59c4970c633fefb564d0693165c96614158341381786
+-- hash: 96fef83dd357a3789aeb3f680d8d2aff4597a74e5b20ec0a6e4b3c29f471d52f
 
 name:           craffiti
 version:        0.1.0.0
@@ -27,7 +27,9 @@ source-repository head
 
 library
   exposed-modules:
+      FreeList
       Lib
+      Prep
   other-modules:
       Paths_craffiti
   hs-source-dirs:
@@ -38,6 +40,7 @@ library
       base >=4.7 && <5
     , bytestring
     , foldl
+    , operational
     , optparse-applicative
     , rio
     , text
@@ -58,6 +61,7 @@ executable craffiti-exe
     , bytestring
     , craffiti
     , foldl
+    , operational
     , optparse-applicative
     , rio
     , text
@@ -79,6 +83,7 @@ test-suite craffiti-test
     , bytestring
     , craffiti
     , foldl
+    , operational
     , optparse-applicative
     , rio
     , text

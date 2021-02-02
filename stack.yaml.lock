@@ -3,7 +3,28 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: free-operational-0.5.0.0@sha256:44044c37672c4db99bf23bcb6d40cccead32013b6da7a9bf0b4f9e9a46ce6c69,3343
+    pantry-tree:
+      size: 805
+      sha256: 2b955463f179c4789360d5a7276eaf1d0b0809243d0b6c6f88f0c223a102eb61
+  original:
+    hackage: free-operational-0.5.0.0@sha256:44044c37672c4db99bf23bcb6d40cccead32013b6da7a9bf0b4f9e9a46ce6c69,3343
+- completed:
+    hackage: comonad-transformers-4.0@sha256:cdc81f6837836ec4b120ced8503b54a7f1e230e08971cc01717dcd16ba1ceb28,831
+    pantry-tree:
+      size: 414
+      sha256: 1319b9d5039d6252803e684d0e42431867b20c903b49ddb6d5910b2b8eeb02e7
+  original:
+    hackage: comonad-transformers-4.0@sha256:cdc81f6837836ec4b120ced8503b54a7f1e230e08971cc01717dcd16ba1ceb28,831
+- completed:
+    hackage: kan-extensions-3.7@sha256:a2178e90704e502b1739c6d8fd5b286d8529554c6afd17a33c84b3815a3d059e,2328
+    pantry-tree:
+      size: 1248
+      sha256: 4235f4de48cb8e59e8789b6ca0e7d2bae9107b9960f599099d07bab466fc5b68
+  original:
+    hackage: kan-extensions-3.7@sha256:a2178e90704e502b1739c6d8fd5b286d8529554c6afd17a33c84b3815a3d059e,2328
 snapshots:
 - completed:
     size: 534126
