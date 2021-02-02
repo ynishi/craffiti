@@ -56,14 +56,16 @@ run opt =
           BSU.fromString $ "Create new project: " ++ projectName
         let projectPath = T.decodeString projectName
         mapM_ (\d -> T.mkdir $ projectPath T.</> d) projectDirs
-        T.cd projectPath
-        T.cd "front"
+        cdIn projectName "front"
         liftIO $ runPrep initOpt (reactProgram projectName)
-        T.cd ".." >> T.cd "server"
+        cdInParent "server"
         liftIO $ runPrep initOpt (stackProgram projectName)
-        T.cd ".." >> T.cd "ai"
+        cdInParent "ai"
         liftIO $ runPrep initOpt noOpProgram
-        T.cd ".." >> T.cd "batch"
+        cdInParent "batch"
         liftIO $ runPrep initOpt noOpProgram
         logInfo $
           displayBytesUtf8 $ BSU.fromString "success, Have a fan to craft!"
+  where
+    cdInParent = cdIn ".."
+    cdIn parent target = T.cd (T.fromString parent) >> T.cd (T.fromString target)
