@@ -29,6 +29,10 @@ dependencies:
 - turtle
 - utf8-string
 - operational
+- yaml
+- raw-strings-qq
+- directory
+- filepath
 
 ghc-options:
 - -Wall
