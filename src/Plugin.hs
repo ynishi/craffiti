@@ -8,6 +8,8 @@
 module Plugin
   ( PrepData(..)
   , extWith
+  , pdr2pd
+  , PrepDataRaw(..)
   ) where
 
 import Control.Applicative

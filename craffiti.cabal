@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 96fef83dd357a3789aeb3f680d8d2aff4597a74e5b20ec0a6e4b3c29f471d52f
+-- hash: a4915e5392a674bf81bf67ecba2e6b4c4a51d76bebf1249e59700b0bf8171f93
 
 name:           craffiti
 version:        0.1.0.0
@@ -29,6 +29,7 @@ library
   exposed-modules:
       FreeList
       Lib
+      Plugin
       Prep
   other-modules:
       Paths_craffiti
@@ -39,13 +40,17 @@ library
   build-depends:
       base >=4.7 && <5
     , bytestring
+    , directory
+    , filepath
     , foldl
     , operational
     , optparse-applicative
+    , raw-strings-qq
     , rio
     , text
     , turtle
     , utf8-string
+    , yaml
   default-language: Haskell2010
 
 executable craffiti-exe
@@ -60,13 +65,17 @@ executable craffiti-exe
       base >=4.7 && <5
     , bytestring
     , craffiti
+    , directory
+    , filepath
     , foldl
     , operational
     , optparse-applicative
+    , raw-strings-qq
     , rio
     , text
     , turtle
     , utf8-string
+    , yaml
   default-language: Haskell2010
 
 test-suite craffiti-test
@@ -82,11 +91,15 @@ test-suite craffiti-test
       base >=4.7 && <5
     , bytestring
     , craffiti
+    , directory
+    , filepath
     , foldl
     , operational
     , optparse-applicative
+    , raw-strings-qq
     , rio
     , text
     , turtle
     , utf8-string
+    , yaml
   default-language: Haskell2010
