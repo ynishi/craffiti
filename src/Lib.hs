@@ -10,8 +10,8 @@ import RIO
 import Options.Applicative
 import qualified Turtle as T
 
-import Data.ByteString.UTF8 as BSU
 import qualified Control.Foldl as Fold
+import Data.ByteString.UTF8 as BSU
 
 import Prep
 
@@ -20,9 +20,9 @@ data Opt = Opt
   }
 
 data Command = New
-  { projectName :: String,
-    initOpt :: Bool}
-
+  { projectName :: String
+  , initOpt :: Bool
+  }
 
 optParser :: Parser Opt
 optParser =
@@ -31,8 +31,8 @@ optParser =
 
 createOptions :: Parser Command
 createOptions =
-  New <$> strArgument (metavar "projectName" <> help "project name for create")
-      <*> switch (long "init" <> short 'i' <> help "whether to only init")
+  New <$> strArgument (metavar "projectName" <> help "project name for create") <*>
+  switch (long "init" <> short 'i' <> help "whether to only init")
 
 parse :: IO Opt
 parse = execParser opts
@@ -57,15 +57,18 @@ run opt =
         let projectPath = T.decodeString projectName
         mapM_ (\d -> T.mkdir $ projectPath T.</> d) projectDirs
         cdIn projectName "front"
-        liftIO $ runPrep initOpt (reactProgram projectName)
+        liftPrep (reactProgram projectName)
         cdInParent "server"
-        liftIO $ runPrep initOpt (stackProgram projectName)
+        liftPrep (stackProgram projectName)
         cdInParent "ai"
-        liftIO $ runPrep initOpt noOpProgram
+        noOp
         cdInParent "batch"
-        liftIO $ runPrep initOpt noOpProgram
+        noOp
         logInfo $
           displayBytesUtf8 $ BSU.fromString "success, Have a fan to craft!"
+      where liftPrep = liftIO . runPrep initOpt
+            noOp = liftPrep noOpProgram
   where
     cdInParent = cdIn ".."
-    cdIn parent target = T.cd (T.fromString parent) >> T.cd (T.fromString target)
+    cdIn parent target =
+      T.cd (T.fromString parent) >> T.cd (T.fromString target)
