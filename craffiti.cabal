@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a4915e5392a674bf81bf67ecba2e6b4c4a51d76bebf1249e59700b0bf8171f93
+-- hash: 357aeda7810052941df89e13be8456e6cdf6f2fd837d13ef83adcff0a7e044cd
 
 name:           craffiti
 version:        0.1.0.0
@@ -40,6 +40,7 @@ library
   build-depends:
       base >=4.7 && <5
     , bytestring
+    , containers
     , directory
     , filepath
     , foldl
@@ -47,6 +48,7 @@ library
     , optparse-applicative
     , raw-strings-qq
     , rio
+    , split
     , text
     , turtle
     , utf8-string
@@ -64,6 +66,7 @@ executable craffiti-exe
   build-depends:
       base >=4.7 && <5
     , bytestring
+    , containers
     , craffiti
     , directory
     , filepath
@@ -72,6 +75,7 @@ executable craffiti-exe
     , optparse-applicative
     , raw-strings-qq
     , rio
+    , split
     , text
     , turtle
     , utf8-string
@@ -90,6 +94,7 @@ test-suite craffiti-test
   build-depends:
       base >=4.7 && <5
     , bytestring
+    , containers
     , craffiti
     , directory
     , filepath
@@ -98,6 +103,7 @@ test-suite craffiti-test
     , optparse-applicative
     , raw-strings-qq
     , rio
+    , split
     , text
     , turtle
     , utf8-string
