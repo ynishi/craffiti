@@ -1,4 +1,6 @@
 {-# LANGUAGE DisambiguateRecordFields #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE NamedFieldPuns #-}
 
 module Lib
   ( parse
@@ -14,9 +16,11 @@ import System.Directory
 import System.FilePath
 import qualified Turtle as T
 
-import qualified Control.Foldl as Fold
 import Data.ByteString.UTF8 as BSU
+import Data.List.Split
+import qualified Data.Map as M
 
+import Control.Monad.Operational (Program)
 import Plugin
 import Prep
 
@@ -53,61 +57,85 @@ parse = execParser opts
         (fullDesc <> progDesc "A scaffolding cli tool for rapid prototyping" <>
          header "craffiti - a simple cli")
 
-projectDirs :: [T.FilePath]
-projectDirs = ["", ".craffiti", "front", "server", "ai", "batch"]
+projectBaseDirs :: [T.FilePath]
+projectBaseDirs = ["", ".craffiti"]
+
+data DoPrep = DoPrep
+  { pdDir :: T.FilePath
+  , pdProgram :: Program Prep (String, Int)
+  }
 
 data PluginMeta = PluginMeta
   { pDir :: String
   , pPlugin :: String
   } deriving (Show)
 
-toPluginMeta opt = PluginMeta dir plugin
+toPrepMeta :: String -> PluginMeta
+toPrepMeta opt = PluginMeta dir plugin
   where
     d = '='
     dir = takeWhile (/= d) opt
     plugin = fromMaybe "" . RL.tailMaybe . dropWhile (/= d) $ opt
+
+toPrepMetas :: String -> [PluginMeta]
+toPrepMetas = map toPrepMeta . splitOn ","
+
+toPluginPrep ::
+     (MonadIO m, MonadReader env m, HasLogFunc env, IsString a)
+  => ProjectName
+  -> PluginMeta
+  -> m (a, Program Prep (String, Int))
+toPluginPrep projectName PluginMeta {pDir, pPlugin} = do
+  home <- liftIO getHomeDirectory
+  let pluginPath = home </> ".craffiti" </> "plugins" </> pPlugin ++ ".yml"
+  isExistsPlugin <- liftIO . doesFileExist $ pluginPath
+  if isExistsPlugin
+    then logInfo $
+         displayBytesUtf8 $ BSU.fromString $ "Plugin: " ++ show pluginPath
+    else error ("Plugin not found: " ++ show pluginPath)
+  prepDataRaw <- liftIO $ Y.decodeFileEither pluginPath
+  let prepData = pdr2pd [] $ fromRight emptyPrepDataRaw prepDataRaw
+  return (T.fromString pDir, pluginProgram projectName prepData)
+
+toPluginPreps ::
+     (Traversable t, MonadIO m, MonadReader env m, HasLogFunc env, IsString a)
+  => ProjectName
+  -> t PluginMeta
+  -> m (t (a, Program Prep (String, Int)))
+toPluginPreps projectName = mapM (toPluginPrep projectName)
+
+defaultPreps ::
+     (Ord k, IsString k) => ProjectName -> Map k (Program Prep (String, Int))
+defaultPreps projectName =
+  M.fromList
+    [ ("front", reactProgram projectName)
+    , ("server", stackProgram projectName)
+    , ("ai", noOpProgram)
+    , ("batch", noOpProgram)
+    ]
 
 run :: Opt -> IO ()
 run opt =
   case optCommand opt of
     New projectName initOpt pluginOpt ->
       runSimpleApp $ do
-        let pluginMeta = toPluginMeta $ fromMaybe "" pluginOpt
-        home <- liftIO getHomeDirectory
-        let pluginPath =
-              home </> ".craffiti" </> "plugins" </> pPlugin pluginMeta ++
-              ".yml"
-        isExistsPlugin <- liftIO . doesFileExist $ pluginPath
-        if isExistsPlugin
-          then logInfo $
-               displayBytesUtf8 $ BSU.fromString $ "Plugin: " ++ show pluginPath
-          else error ("Plugin not found: " ++ show pluginPath)
-        prepDataRaw <- liftIO $ Y.decodeFile pluginPath
-        let prepData = pdr2pd [] $ fromMaybe (PrepDataRaw {}) prepDataRaw
-        let pluginPrep = pluginProgram projectName prepData
+        let pluginMetas = toPrepMetas $ fromMaybe "" pluginOpt
+        pluginPreps <- toPluginPreps projectName pluginMetas
         logInfo $
           displayBytesUtf8 $
           BSU.fromString $ "Create new project: " ++ projectName
-        let projectPath = T.decodeString projectName
-        let ppath = T.fromString $ pDir pluginMeta
+        let preps :: [DoPrep] =
+              RL.map snd . M.toList . M.mapWithKey DoPrep $
+              M.union (M.fromList pluginPreps) (defaultPreps projectName)
+        projectPathAbs <- liftIO . makeAbsolute $ projectName
+        let projectPath = T.fromString projectPathAbs
+        mapM_ (\d -> T.mkdir $ projectPath T.</> d) projectBaseDirs
         mapM_
-          (\d -> T.mkdir $ projectPath T.</> d)
-          (projectDirs ++ ([ppath | ppath `notElem` projectDirs]))
-        cdIn projectName "front"
-        liftPrep (reactProgram projectName)
-        cdInParent "server"
-        liftPrep (stackProgram projectName)
-        cdInParent "ai"
-        noOp
-        cdInParent "batch"
-        noOp
-        cdInParent . pDir $ pluginMeta
-        liftPrep pluginPrep
+          (\DoPrep {pdDir, pdProgram} -> do
+             logInfo . displayBytesUtf8 $ BSU.fromString ("do:" ++ show pdDir)
+             let pdPath = projectPath T.</> pdDir
+             T.mkdir pdPath >> T.cd pdPath
+             liftIO $ runPrep initOpt pdProgram)
+          preps
         logInfo $
           displayBytesUtf8 $ BSU.fromString "success, Have a fan to craft!"
-      where liftPrep = liftIO . runPrep initOpt
-            noOp = liftPrep noOpProgram
-  where
-    cdInParent = cdIn ".."
-    cdIn parent target =
-      T.cd (T.fromString parent) >> T.cd (T.fromString target)

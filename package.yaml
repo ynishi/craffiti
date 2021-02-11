@@ -33,6 +33,8 @@ dependencies:
 - raw-strings-qq
 - directory
 - filepath
+- containers
+- split
 
 ghc-options:
 - -Wall

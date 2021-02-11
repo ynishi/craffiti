@@ -11,7 +11,6 @@ import qualified Control.Foldl as Fold
 import Data.ByteString.UTF8 as BSU
 import Plugin
 import RIO
-import RIO.List as RL
 import qualified Turtle as T
 
 import Control.Monad.Operational as O
@@ -85,7 +84,9 @@ runPrep initOpt = interpretWithMonad eval
             then logInfo . displayBytesUtf8 . BSU.fromString $
                  "option init set, don't install:" ++ show commands
             else do
-              T.cd $ T.fromString projectName
+              let projectDir = T.fromString projectName
+              T.mktree projectDir
+              T.cd projectDir
               logInfo . displayBytesUtf8 . BSU.fromString $
                 "start install:" ++ show commands
               res <- Prep.get . toCmd $ commands
