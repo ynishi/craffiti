@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 357aeda7810052941df89e13be8456e6cdf6f2fd837d13ef83adcff0a7e044cd
+-- hash: 3a2997f02c13084bc3050178eae57cb88fc30f07341870763e9cc5b81ac7a09e
 
 name:           craffiti
 version:        0.1.0.0
@@ -86,6 +86,7 @@ test-suite craffiti-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      PrepSpec
       Paths_craffiti
   hs-source-dirs:
       test
@@ -99,6 +100,8 @@ test-suite craffiti-test
     , directory
     , filepath
     , foldl
+    , hspec
+    , hspec-discover
     , operational
     , optparse-applicative
     , raw-strings-qq
