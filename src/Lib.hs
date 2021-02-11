@@ -18,7 +18,6 @@ import qualified Turtle as T
 
 import Data.ByteString.UTF8 as BSU
 import Data.List.Split
-
 import qualified Data.Map as M
 
 import Control.Monad.Operational (Program)
@@ -114,11 +113,6 @@ defaultPreps projectName =
     , ("ai", noOpProgram)
     , ("batch", noOpProgram)
     ]
-
-data App = App
-  { appName :: !String
-  , appHandle :: !Handle
-  }
 
 run :: Opt -> IO ()
 run opt =
