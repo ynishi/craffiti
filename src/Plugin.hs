@@ -10,15 +10,13 @@ module Plugin
   , extWith
   , pdr2pd
   , PrepDataRaw(..)
+  , emptyPrepDataRaw
   ) where
 
 import Control.Applicative
-import Data.ByteString (ByteString)
-import Data.ByteString.UTF8 as BSU
 import qualified Data.Yaml as Y
 import RIO
 import RIO.List as RL
-import Text.RawString.QQ
 
 data PrepData
   = PrepData { pdInits :: PrepData
@@ -39,12 +37,6 @@ data PrepData
   | PDConst String
   | PDEmpty
   deriving (Show)
-
-toTuple (PrepData init install files) = (init, install, files)
-
-toTupleExt pd = (ext init, ext install, ext files)
-  where
-    (init, install, files) = toTuple pd
 
 extWith :: [(String, String)] -> PrepData -> [String]
 extWith vars p@PDInit {} = ext p {pdiVars = toVars vars}
@@ -76,6 +68,9 @@ data PrepDataRaw = PrepDataRaw
   , installs :: Maybe [String]
   , files :: Maybe [FileRaw]
   } deriving (Show)
+
+emptyPrepDataRaw :: PrepDataRaw
+emptyPrepDataRaw = PrepDataRaw Nothing Nothing Nothing Nothing Nothing
 
 data FileRaw = FileRaw
   { name :: String
