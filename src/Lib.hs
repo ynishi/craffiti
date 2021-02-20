@@ -114,3 +114,10 @@ runWith opt =
           preps
         logInfo $
           displayBytesUtf8 $ BSU.fromString "success, Have a fan to craft!"
+    Update {isDryRun, pluginOpt} ->
+      runSimpleApp $ do
+        logInfo $
+          displayBytesUtf8 $
+          BSU.fromString $
+          "update start:isDryRun" ++
+          show isDryRun ++ ":pluginOpt:" ++ show pluginOpt
