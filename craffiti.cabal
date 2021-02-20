@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 357aeda7810052941df89e13be8456e6cdf6f2fd837d13ef83adcff0a7e044cd
+-- hash: f6c8eab51486a4dfa2727126c3c7591fd1665516c6d9e13eb286c23b55c8a859
 
 name:           craffiti
 version:        0.1.0.0
@@ -27,8 +27,8 @@ source-repository head
 
 library
   exposed-modules:
-      FreeList
       Lib
+      Opt
       Plugin
       Prep
   other-modules:

@@ -3,15 +3,13 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
 module Lib
-  ( parse
-  , run
+  ( run
   ) where
 
 import RIO
 import RIO.List as RL
 
 import qualified Data.Yaml as Y
-import Options.Applicative
 import System.Directory
 import System.FilePath
 import qualified Turtle as T
@@ -21,41 +19,9 @@ import Data.List.Split
 import qualified Data.Map as M
 
 import Control.Monad.Operational (Program)
+import Opt
 import Plugin
 import Prep
-
-data Opt = Opt
-  { optCommand :: Command
-  }
-
-data Command = New
-  { projectName :: String
-  , initOpt :: Bool
-  , pluginOpt :: Maybe String
-  }
-
-optParser :: Parser Opt
-optParser =
-  Opt <$>
-  subparser (command "new" (info createOptions (progDesc "create new project")))
-
-createOptions :: Parser Command
-createOptions =
-  New <$> strArgument (metavar "projectName" <> help "project name for create") <*>
-  switch (long "init" <> short 'i' <> help "whether to only init") <*>
-  optional
-    (strOption
-       (long "plugin" <> short 'p' <> metavar "TARGET=PLUGIN" <>
-        help "set front plugin"))
-
-parse :: IO Opt
-parse = execParser opts
-  where
-    opts =
-      info
-        (optParser <**> helper)
-        (fullDesc <> progDesc "A scaffolding cli tool for rapid prototyping" <>
-         header "craffiti - a simple cli")
 
 projectBaseDirs :: [T.FilePath]
 projectBaseDirs = ["", ".craffiti"]
@@ -114,10 +80,16 @@ defaultPreps projectName =
     , ("batch", noOpProgram)
     ]
 
-run :: Opt -> IO ()
-run opt =
+toDisableList :: IsString b => Maybe String -> [b]
+toDisableList = map T.fromString . splitOn "," . fromMaybe ""
+
+run :: IO ()
+run = runWith =<< parse
+
+runWith :: Opt -> IO ()
+runWith opt =
   case optCommand opt of
-    New projectName initOpt pluginOpt ->
+    New projectName initOpt pluginOpt disableOpt ->
       runSimpleApp $ do
         let pluginMetas = toPrepMetas $ fromMaybe "" pluginOpt
         pluginPreps <- toPluginPreps projectName pluginMetas
@@ -125,7 +97,10 @@ run opt =
           displayBytesUtf8 $
           BSU.fromString $ "Create new project: " ++ projectName
         let preps :: [DoPrep] =
-              RL.map snd . M.toList . M.mapWithKey DoPrep $
+              RL.map snd .
+              M.toList .
+              M.filterWithKey (\k _ -> k `notElem` toDisableList disableOpt) .
+              M.mapWithKey DoPrep $
               M.union (M.fromList pluginPreps) (defaultPreps projectName)
         projectPathAbs <- liftIO . makeAbsolute $ projectName
         let projectPath = T.fromString projectPathAbs
