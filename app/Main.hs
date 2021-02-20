@@ -1,7 +1,8 @@
 module Main where
 
-import Lib
 import RIO
+import Lib
+
 
 main :: IO ()
-main = run =<< parse
+main = run
