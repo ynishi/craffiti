@@ -74,7 +74,8 @@ defaultPreps ::
      (Ord k, IsString k) => ProjectName -> Map k (Program Prep (String, Int))
 defaultPreps projectName =
   M.fromList
-    [ ("front", reactProgram projectName)
+    [ ("document", noOpProgram)
+    , ("front", reactProgram projectName)
     , ("server", stackProgram projectName)
     , ("ai", noOpProgram)
     , ("batch", noOpProgram)
@@ -91,8 +92,8 @@ runWith opt =
   case optCommand opt of
     New projectName initOpt pluginOpt disableOpt ->
       runSimpleApp $ do
-        let pluginMetas = toPrepMetas $ fromMaybe "" pluginOpt
-        pluginPreps <- toPluginPreps projectName pluginMetas
+        let pluginMetas = toPrepMetas <$> pluginOpt
+        pluginPreps <- toPluginPreps projectName . fromMaybe [] $ pluginMetas
         logInfo $
           displayBytesUtf8 $
           BSU.fromString $ "Create new project: " ++ projectName
